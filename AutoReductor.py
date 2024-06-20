@@ -36,6 +36,7 @@ def save_fig(path_to_save,file_name):
     plt.savefig(os.path.join(path_to_save,file_name))
 
 class AutoReductor():
+    results_folder = "results"
     #todo: min_reduction, max_reduction
     reduction_model_dict = {
         'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,10))} )
@@ -52,10 +53,13 @@ class AutoReductor():
         data = DataPreproces.unwrapper(data)
         print(data[0].shape)
         
-        ops = OptimalParametersSelector(data, self.reduction_model_dict, self.evaluation_model_list[0])
-        ops.find_optimal_param()
-        result = ops.get_result()
-        plot(result, "results", "try1.png")
+        for eval_modle in self.evaluation_model_list:
+            ops = OptimalParametersSelector(data, self.reduction_model_dict, eval_modle)
+            ops.find_optimal_param()
+            result = ops.get_result()
+            save_path = os.path.join(self.results_folder, str(eval_modle))
+            save_name = "_".join(self.reduction_model_dict.keys()) + ".png"
+            plot(result, save_path, save_name)
         
         # best_pipline = myReducePipline(ops.get_best_sequence(), ops.get_best_parametrs()) # todo
         
