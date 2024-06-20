@@ -37,5 +37,8 @@ class OptimalParametersSelector():
         grid_search = GridSearchCV(self.pipeline, param_grid=self.param_grid, cv=2, scoring='accuracy', return_train_score=True, verbose=2)
         grid_search.fit(x_train, y_train)
 
-        params = ['param_model'+i+'__'+parametr_name[i] for i in range(len(reduction_model_list))]
-        self.results = pd.DataFrame(grid_search.cv_results_)[['param_SVD__n_components', 'mean_test_score', 'rank_test_score', 'mean_fit_time', 'mean_score_time']]
+        params = ['param_' + key for key in self.param_grid.keys() ]
+        self.results = pd.DataFrame(grid_search.cv_results_)[[*params, 'mean_test_score', 'mean_fit_time', 'mean_score_time']]
+    
+    def get_result(self):
+        return self.results
