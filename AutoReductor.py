@@ -5,21 +5,23 @@ from OptimalParametersSelector import OptimalParametersSelector
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+from MyReductionModels import Autoencoder
 
 def plot(df, path_to_save=None, file_name=None):
     fig, ax1 = plt.subplots(figsize=(8, 4))    
     ax2 = ax1.twinx()
     ax3 = ax1.twinx()
     ax3.spines['right'].set_position(('outward', 60))
+    
+    x_layer = df.iloc[:, :-3].apply(lambda x: "_".join(x.astype(str)), axis=1)
+    ax1.plot(x_layer, df['mean_test_score'], 'g-')
+    ax2.plot(x_layer, df['mean_fit_time'], 'b-')
+    ax3.plot(x_layer, df['mean_score_time'], 'r-')
 
-    ax1.plot(df['param_SVD__n_components'], df['mean_test_score'], 'g-')
-    ax2.plot(df['param_SVD__n_components'], df['mean_fit_time'], 'b-')
-    ax3.plot(df['param_SVD__n_components'], df['mean_score_time'], 'r-')
-
-    ax1.set_xlabel('param_SVD__n_components')
-    ax1.set_ylabel('mean_test_score', color='g')
-    ax2.set_ylabel('mean_fit_time', color='b')
-    ax3.set_ylabel('mean_score_time', color='r')
+    ax1.set_xlabel(' '.join(df.columns))
+    ax1.set_ylabel('Eval_model_accuracy', color='g')
+    ax2.set_ylabel('fit_time', color='b')
+    ax3.set_ylabel('score_time', color='r')
 
     plt.tight_layout()
     
@@ -39,6 +41,7 @@ class AutoReductor():
     results_folder = "results"
     #todo: min_reduction, max_reduction
     reduction_model_dict = {
+        'AE': (Autoencoder(), { 'AE__lat_dim_ae': list(range(10,110,10)) } ),
         'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,10))} )
         }
     evaluation_model_list = [MLPClassifier(solver="lbfgs")]
@@ -50,7 +53,7 @@ class AutoReductor():
         dl = DataLoader(DataLoader.load_mnist) # + інші датасети + можливість вибирати датасет
         data = dl.get_gata()
         data = DataPreproces.normalize_x(data)
-        data = DataPreproces.unwrapper(data)
+        # data = DataPreproces.unwrapper(data)
         print(data[0].shape)
         
         for eval_modle in self.evaluation_model_list:
