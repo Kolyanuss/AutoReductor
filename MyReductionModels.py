@@ -5,9 +5,9 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import MeanSquaredError
 
 class Autoencoder(BaseEstimator, TransformerMixin):
-    def __init__(self, lat_dim_ae=30):
+    def __init__(self, input_shape = (28, 28, 1),  lat_dim_ae=30):
         self.lat_dim_ae = lat_dim_ae
-        self.input_shape = (28, 28, 1)
+        self.input_shape = input_shape
         self.autoencoder = None
     
     def build_model(self):
