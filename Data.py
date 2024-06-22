@@ -7,6 +7,10 @@ class DataLoader():
     def load_mnist(self):
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
         self.data = (x_train, y_train, x_test, y_test)
+        
+    def load_fashion_mnist(self):
+        (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
+        self.data = (x_train, y_train, x_test, y_test)
     
     def get_gata(self):
         return self.data
