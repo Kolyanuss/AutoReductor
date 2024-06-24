@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 
 class DataLoader():
@@ -27,3 +28,11 @@ class DataPreproces():
         x_train_flat = x_train.reshape((len(x_train), -1))
         x_test_flat = x_test.reshape((len(x_test), -1))
         return (x_train_flat, y_train, x_test_flat, y_test)
+    
+    def add_gaussian_noise(data, mean=0.0, std=0.1):
+        (x_train, y_train, x_test, y_test) = data
+        noise = np.random.normal(mean, std, x_train.shape)
+        x_train_noise = x_train + noise
+        noise = np.random.normal(mean, std, x_test.shape)
+        x_test_noise = x_test + noise
+        return (x_train_noise, y_train, x_test_noise, y_test)

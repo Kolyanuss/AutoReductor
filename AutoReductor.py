@@ -41,9 +41,10 @@ def save_fig(path_to_save,file_name):
 class AutoReductor():
     results_folder = "results"
     evaluation_model_list = [MLPClassifier(solver="lbfgs")]
+    add_noise = False
     
     def __init__(self, min_reduction = 5, max_reduction = 20, step_count = 3) -> None:
-        dl = DataLoader(DataLoader.load_fashion_mnist) # + інші датасети + можливість вибирати датасет
+        dl = DataLoader(DataLoader.load_mnist) # + інші датасети + можливість вибирати датасет
         self.data = dl.get_gata()
         
         original_dimm = self.data[0].shape[1:]
@@ -62,7 +63,7 @@ class AutoReductor():
         ae_input = original_dimm if len(original_dimm) > 2 else original_dimm + (1,)
         
         self.reduction_model_dict = {
-            'AE': (Autoencoder(ae_input), { 'AE__lat_dim_ae': list(range(50,160,40)) } ),
+            'AE': (Autoencoder(ae_input), { 'AE__lat_dim_ae': list(range(50,90,30)) } ),
             # 'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,40))} )
             'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(svd_min, svd_max, svd_step))} )
             }
@@ -70,6 +71,10 @@ class AutoReductor():
     def start(self):
         self.data = DataPreproces.normalize_x(self.data)
         # self.data = DataPreproces.unwrapper(self.data)
+        noised = ""
+        if self.add_noise:
+            self.data = DataPreproces.add_gaussian_noise(self.data)
+            noised = "_noised"
         print(self.data[0].shape)
         
         for eval_modle in self.evaluation_model_list:
@@ -77,7 +82,7 @@ class AutoReductor():
             ops.find_optimal_param()
             result = ops.get_result()
             save_path = os.path.join(self.results_folder, str(eval_modle))
-            save_name = "_".join(self.reduction_model_dict.keys()) + ".png"
+            save_name = "_".join(self.reduction_model_dict.keys()) + noised + ".png"
             plot(result, save_path, save_name)
         
         # best_pipline = myReducePipline(ops.get_best_sequence(), ops.get_best_parametrs()) # todo
