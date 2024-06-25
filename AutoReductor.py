@@ -45,28 +45,32 @@ class AutoReductor():
     
     def __init__(self, min_reduction = 5, max_reduction = 20, step_count = 3) -> None:
         dl = DataLoader(DataLoader.load_mnist) # + інші датасети + можливість вибирати датасет
-        self.data = dl.get_gata()
-        
-        original_dimm = self.data[0].shape[1:]
-        original_dimm_flaten = math.prod(original_dimm[:2])
-        
-        svd_min = round(math.floor(original_dimm_flaten / max_reduction), -1)
-        if svd_min < 10:
-            svd_min = 10
-            
-        svd_max = round(math.floor(original_dimm_flaten / min_reduction), -1)
-        if svd_max > original_dimm_flaten:
-            svd_max = original_dimm_flaten
-        
-        svd_step = round(math.floor((svd_max-svd_min) / step_count), 0)
-        
-        ae_input = original_dimm if len(original_dimm) > 2 else original_dimm + (1,)
+        self.data = dl.get_gata()        
+        self.original_dimm = self.data[0].shape[1:]
+                        
+        ae_input = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
         
         self.reduction_model_dict = {
             'AE': (Autoencoder(ae_input), { 'AE__lat_dim_ae': list(range(50,90,30)) } ),
             # 'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,40))} )
-            'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(svd_min, svd_max, svd_step))} )
+            'SVD': (TruncatedSVD(), {'SVD__n_components': list(self.create_reduction_range(min_reduction, max_reduction, step_count))} )
             }
+    
+    def create_reduction_range(self, min_reduction, max_reduction, step_count):
+        original_dimm_flaten = math.prod(self.original_dimm[:2])
+        
+        reduction_min = round(math.floor(original_dimm_flaten / max_reduction), -1)
+        if reduction_min < 10:
+            reduction_min = 10
+            
+        reduction_max = round(math.floor(original_dimm_flaten / min_reduction), -1)
+        if reduction_max > original_dimm_flaten:
+            reduction_max = original_dimm_flaten
+        
+        reduction_step = round(math.floor((reduction_max-reduction_min) / step_count), 0)
+        
+        return range(reduction_min, reduction_max, reduction_step)
+        
     
     def start(self):
         self.data = DataPreproces.normalize_x(self.data)
