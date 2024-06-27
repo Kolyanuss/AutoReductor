@@ -7,10 +7,15 @@ from tensorflow.keras.layers import Input, Dense, Flatten, Reshape, Conv2D, MaxP
 class myReducePipline():
     lat_dim_ae = 32
     lat_dim_svd = 70
+    reduction_models_list = []
 
     def __init__(self) -> None:
         self.create_ae()
         self.create_svd()
+    
+    def __init__(self, models_list, params) -> None:
+        for model, parametr in zip(models_list, params):
+            self.reduction_models_list.append(ModelCreator(model, parametr))
 
     def create_ae(self):
         # Input shape (assuming MNIST data)
