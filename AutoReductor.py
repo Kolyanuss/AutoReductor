@@ -1,11 +1,13 @@
 from sklearn.decomposition import TruncatedSVD
 from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 import math
 import os
 from Data import DataLoader, DataPreproces
 from OptimalParametersSelector import OptimalParametersSelector
 from MyReductionModels import Autoencoder
+from MyEvaluationModels import get_CNN_model, get_ANN
 
 def plot(df, path_to_save=None, file_name=None):
     fig, ax1 = plt.subplots(figsize=(10, 4))    
@@ -40,21 +42,23 @@ def save_fig(path_to_save,file_name):
 
 class AutoReductor():
     results_folder = "results"
-    evaluation_model_list = [MLPClassifier(solver="lbfgs")]
+    evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear')]
     add_noise = False
     
-    def __init__(self, min_reduction = 5, max_reduction = 20, step_count = 3) -> None:
-        dl = DataLoader(DataLoader.load_mnist) # + інші датасети + можливість вибирати датасет
+    def __init__(self, min_reduction = 2, max_reduction = 8, step_count = 2) -> None:
+        dl = DataLoader(DataLoader.load_cifar10) # + інші датасети + можливість вибирати датасет
         self.data = dl.get_gata()        
         self.original_dimm = self.data[0].shape[1:]
                         
-        ae_input = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
+        dataset_input_shape = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
         
         self.reduction_model_dict = {
-            'AE': (Autoencoder(ae_input), { 'AE__lat_dim_ae': list(range(50,90,30)) } ),
+            'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': list(range(50*3,160*3,300*3)) } ),
             # 'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,40))} )
             'SVD': (TruncatedSVD(), {'SVD__n_components': list(self.create_reduction_range(min_reduction, max_reduction, step_count))} )
             }
+        # self.evaluation_model_list = [get_ANN((math.prod(dataset_input_shape),))]
+        self.evaluation_model_list = [self.evaluation_model_list[0]]
     
     def create_reduction_range(self, min_reduction, max_reduction, step_count):
         original_dimm_flaten = math.prod(self.original_dimm[:2])
