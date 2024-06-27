@@ -12,6 +12,10 @@ class DataLoader():
     def load_fashion_mnist(self):
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
         self.data = (x_train, y_train, x_test, y_test)
+        
+    def load_cifar10(self):
+        (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+        self.data = (x_train, y_train.ravel(), x_test, y_test.ravel())
     
     def get_gata(self):
         return self.data
