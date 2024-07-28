@@ -2,6 +2,8 @@
 import pandas as pd
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 class OptimalParametersSelector():
     def __init__(self, data, reduction_model_dict, evaluation_model) -> None:
@@ -42,3 +44,16 @@ class OptimalParametersSelector():
     
     def get_result(self):
         return self.results
+    
+    def plot_accuracy_matrix(self):
+        arr = self.results
+        heatmap_data = arr.pivot(index=arr.columns[0], columns=arr.columns[1], values='mean_test_score')
+        
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(heatmap_data, annot=True, cmap='YlOrRd', fmt='.2f')
+
+        plt.title('Heatmap of Accuracy')
+        plt.xlabel('SVD_n_components')
+        plt.ylabel(arr.columns[0])
+
+        plt.show()

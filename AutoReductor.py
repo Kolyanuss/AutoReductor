@@ -16,7 +16,6 @@ def plot(df, path_to_save=None, file_name=None):
     ax3.spines['right'].set_position(('outward', 60))
     
     x_layer = df.iloc[:, :-3].apply(lambda x: ",".join(x.astype(str)), axis=1) # combination of params
-    ax1.set_xticklabels(x_layer, rotation=90)
     ax1.plot(x_layer, df['mean_test_score'], 'g-')
     ax2.plot(x_layer, df['mean_fit_time'], 'b-')
     ax3.plot(x_layer, df['mean_score_time'], 'r-')
@@ -25,6 +24,9 @@ def plot(df, path_to_save=None, file_name=None):
     ax1.set_ylabel('Eval_model_accuracy', color='g')
     ax2.set_ylabel('fit_time', color='b')
     ax3.set_ylabel('score_time', color='r')
+    
+    ax1.set_xticks(range(len(x_layer)))
+    ax1.set_xticklabels(x_layer, rotation=90)
 
     plt.tight_layout()
     
@@ -53,7 +55,7 @@ class AutoReductor():
         dataset_input_shape = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
         
         self.reduction_model_dict = {
-            'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': list(range(50*3,160*3,300*3)) } ),
+            'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': list(range(50*4,160*5,30*6)) } ),
             # 'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,40))} )
             'SVD': (TruncatedSVD(), {'SVD__n_components': list(self.create_reduction_range(min_reduction, max_reduction, step_count))} )
             }
@@ -88,6 +90,7 @@ class AutoReductor():
         for eval_modle in self.evaluation_model_list:
             ops = OptimalParametersSelector(self.data, self.reduction_model_dict, eval_modle)
             ops.find_optimal_param()
+            ops.plot_accuracy_matrix()
             result = ops.get_result()
             save_path = os.path.join(self.results_folder, str(eval_modle))
             save_name = "_".join(self.reduction_model_dict.keys()) + noised + ".png"
