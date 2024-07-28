@@ -47,7 +47,7 @@ class AutoReductor():
     evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear')]
     add_noise = False
     
-    def __init__(self, min_reduction_svd = 2, max_reduction_svd = 8, step_count_svd = 2) -> None:
+    def __init__(self, min_reduction_svd = 2, max_reduction_svd = 8, step_count_svd = 2, min_reduction_ae = 2, max_reduction_ae = 8, step_count_ae = 2) -> None:
         """
         Args:
         - min_reduction: Minimum reduction by X times.
@@ -59,11 +59,13 @@ class AutoReductor():
         self.original_dimm = self.data[0].shape[1:]
                         
         dataset_input_shape = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
-        
+        ae_range = list(self.create_reduction_range(min_reduction_ae, max_reduction_ae, step_count_ae))
+        svd_range = list(self.create_reduction_range(min_reduction_svd, max_reduction_svd, step_count_svd))
         self.reduction_model_dict = {
-            'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': list(range(50*4,160*5,30*6)) } ),
+            # 'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': list(range(50*4,160*5,30*6)) } ),
             # 'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,40))} )
-            'SVD': (TruncatedSVD(), {'SVD__n_components': list(self.create_reduction_range(min_reduction_svd, max_reduction_svd, step_count_svd))} )
+            'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': ae_range } ),
+            'SVD': (TruncatedSVD(), {'SVD__n_components': svd_range } )
             }
         # self.evaluation_model_list = [get_ANN((math.prod(dataset_input_shape),))]
         self.evaluation_model_list = [self.evaluation_model_list[0]]
@@ -104,4 +106,4 @@ class AutoReductor():
         
         # best_pipline = myReducePipline(ops.get_best_sequence(), ops.get_best_parametrs()) # todo
         
-AutoReductor().start()
+# AutoReductor().start()
