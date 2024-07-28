@@ -47,7 +47,13 @@ class AutoReductor():
     evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear')]
     add_noise = False
     
-    def __init__(self, min_reduction = 2, max_reduction = 8, step_count = 2) -> None:
+    def __init__(self, min_reduction_svd = 2, max_reduction_svd = 8, step_count_svd = 2) -> None:
+        """
+        Args:
+        - min_reduction: Minimum reduction by X times.
+        - max_reduction: Maximum reduction by X times.
+        - step_count: Count of steps betven min and max.
+        """
         dl = DataLoader(DataLoader.load_cifar10) # + інші датасети + можливість вибирати датасет
         self.data = dl.get_gata()        
         self.original_dimm = self.data[0].shape[1:]
@@ -57,7 +63,7 @@ class AutoReductor():
         self.reduction_model_dict = {
             'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': list(range(50*4,160*5,30*6)) } ),
             # 'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,40))} )
-            'SVD': (TruncatedSVD(), {'SVD__n_components': list(self.create_reduction_range(min_reduction, max_reduction, step_count))} )
+            'SVD': (TruncatedSVD(), {'SVD__n_components': list(self.create_reduction_range(min_reduction_svd, max_reduction_svd, step_count_svd))} )
             }
         # self.evaluation_model_list = [get_ANN((math.prod(dataset_input_shape),))]
         self.evaluation_model_list = [self.evaluation_model_list[0]]
@@ -65,17 +71,17 @@ class AutoReductor():
     def create_reduction_range(self, min_reduction, max_reduction, step_count):
         original_dimm_flaten = math.prod(self.original_dimm[:2])
         
-        reduction_min = round(math.floor(original_dimm_flaten / max_reduction), -1)
-        if reduction_min < 10:
-            reduction_min = 10
+        range_min = round(math.floor(original_dimm_flaten / max_reduction), -1)
+        if range_min < 10:
+            range_min = 10
             
-        reduction_max = round(math.floor(original_dimm_flaten / min_reduction), -1)
-        if reduction_max > original_dimm_flaten:
-            reduction_max = original_dimm_flaten
+        range_max = round(math.floor(original_dimm_flaten / min_reduction), -1)
+        if range_max > original_dimm_flaten:
+            range_max = original_dimm_flaten
         
-        reduction_step = round(math.floor((reduction_max-reduction_min) / step_count), 0)
+        range_step = round(math.floor((range_max-range_min) / step_count), 0)
         
-        return range(reduction_min, reduction_max, reduction_step)
+        return range(range_min, range_max, range_step)
         
     
     def start(self):
