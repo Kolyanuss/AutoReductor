@@ -1,9 +1,13 @@
-from sklearn.decomposition import TruncatedSVD
+from sklearn.decomposition import PCA, TruncatedSVD, FastICA, NMF
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
+from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import math
 import os
+
 from Data import DataLoader, DataPreproces
 from OptimalParametersSelector import OptimalParametersSelector
 from MyReductionModels import Autoencoder
@@ -44,7 +48,8 @@ def save_fig(path_to_save,file_name):
 
 class AutoReductor():
     results_folder = "results"
-    evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear')]
+    evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear'), DecisionTreeClassifier(), RandomForestClassifier()]
+    reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
     add_noise = False
     
     def __init__(self, min_reduction_svd = 2, max_reduction_svd = 8, step_count_svd = 2, min_reduction_ae = 2, max_reduction_ae = 8, step_count_ae = 2) -> None:
