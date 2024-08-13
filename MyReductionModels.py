@@ -5,6 +5,9 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import MeanSquaredError
 
+from sklearn.decomposition import PCA, TruncatedSVD, FastICA, NMF
+from sklearn.manifold import TSNE
+
 class Autoencoder(BaseEstimator, TransformerMixin):
     def __init__(self, input_shape,  lat_dim_ae=30):
         self.lat_dim_ae = lat_dim_ae
@@ -45,3 +48,10 @@ class Autoencoder(BaseEstimator, TransformerMixin):
     def transform(self, X):
         result_x = self.autoencoder.predict(X)
         return result_x.reshape((len(result_x), -1))
+
+reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
+
+def get_reduction_model_by_name(name):
+    for model in reduction_model_list:
+        if str(model) == name:
+            return model

@@ -2,33 +2,34 @@ import numpy as np
 import tensorflow as tf
 
 class DataLoader():
-    def __init__(self, dataset) -> None:        
-        dataset(self)
+    def __init__(self):
+        self.dataset_dict = {"mnist": self.__mnist, "fashion_mnist": self.__fashion_mnist, "cifar10": self.__cifar10 }
+        
+    def get_datasets_names(self):
+        return list(self.dataset_dict.keys())
     
-    def load_mnist(self):
+    def __mnist(self):
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-        self.data = (x_train, y_train, x_test, y_test)
+        return (x_train, y_train, x_test, y_test)
         
-    def load_fashion_mnist(self):
+    def __fashion_mnist(self):
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
-        self.data = (x_train, y_train, x_test, y_test)
+        return (x_train, y_train, x_test, y_test)
         
-    def load_cifar10(self):
+    def __cifar10(self):
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
-        self.data = (x_train, y_train.ravel(), x_test, y_test.ravel())
+        return (x_train, y_train.ravel(), x_test, y_test.ravel())
     
-    def get_gata(self):
-        return self.data
     
     def get_data_by_name(self, name):
-        if name == "mnist":
-            self.load_mnist()
-        if name == "fashion_mnist":
-            self.load_fashion_mnist()
-        if name == "cifar10":
-            self.load_cifar10()
-            
-        return self.get_gata()
+        try:
+            data_loader_func = self.dataset_dict[name]
+            return data_loader_func()
+        except Exception as e:
+            print("Error in Data module:")
+            print(e)
+            exit(1)
+    
     
 class DataPreproces():    
     def normalize_x(data):
