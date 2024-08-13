@@ -74,8 +74,8 @@ class AutoReductor():
             'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': ae_range } ),
             'SVD': (TruncatedSVD(), {'SVD__n_components': svd_range } )
             }
-        # self.evaluation_model_list = [get_ANN((math.prod(dataset_input_shape),))]
-        self.evaluation_model_list = [evaluation_model_list[0]]
+        # self.evaluation_model = get_ANN((math.prod(dataset_input_shape),))
+        self.evaluation_model = evaluation_model_list[0] # example
     
     def create_reduction_range(self, min_reduction, max_reduction, step_count):
         original_dimm_flaten = math.prod(self.original_dimm[:2])
@@ -102,14 +102,13 @@ class AutoReductor():
             noised = "_noised"
         print(self.data[0].shape)
         
-        for eval_modle in self.evaluation_model_list:
-            ops = OptimalParametersSelector(self.data, self.reduction_model_dict, eval_modle)
-            ops.find_optimal_param()
-            ops.plot_accuracy_matrix()
-            result = ops.get_result()
-            save_path = os.path.join(self.results_folder, str(eval_modle))
-            save_name = "_".join(self.reduction_model_dict.keys()) + noised + ".png"
-            plot(result, save_path, save_name)
+        ops = OptimalParametersSelector(self.data, self.reduction_model_dict, self.evaluation_model)
+        ops.find_optimal_param()
+        ops.plot_accuracy_matrix()
+        result = ops.get_result()
+        save_path = os.path.join(self.results_folder, str(self.evaluation_model))
+        save_name = "_".join(self.reduction_model_dict.keys()) + noised + ".png"
+        plot(result, save_path, save_name)
         
         # best_pipline = myReducePipline(ops.get_best_sequence(), ops.get_best_parametrs()) # todo
         
