@@ -1,22 +1,17 @@
-from sklearn.decomposition import PCA, TruncatedSVD, FastICA, NMF
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.svm import SVC
-from sklearn.manifold import TSNE
+from sklearn.decomposition import TruncatedSVD
 import matplotlib.pyplot as plt
 import math
 import os
 
+import MyEvaluationModels, MyReductionModels
 from Data import DataLoader, DataPreproces
 from OptimalParametersSelector import OptimalParametersSelector
 from MyReductionModels import Autoencoder
-from MyEvaluationModels import get_CNN_model, get_ANN
 from form import get_search_criteria
 from form2 import get_pipline_algorithms_and_ranges
 
-evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear'), DecisionTreeClassifier(), RandomForestClassifier()]
-reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
+# evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear'), DecisionTreeClassifier(), RandomForestClassifier()]
+# reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
 
 def plot(df, path_to_save=None, file_name=None):
     fig, ax1 = plt.subplots(figsize=(10, 4))    
@@ -64,8 +59,8 @@ class AutoReductor():
         - max_reduction: Maximum reduction by X times.
         - step_count: Count of steps betven min and max.
         """
-        dl = DataLoader(DataLoader.load_cifar10) # + інші датасети + можливість вибирати датасет
-        self.data = dl.get_gata()        
+        dl = DataLoader(DataLoader.cifar10) # + інші датасети + можливість вибирати датасет
+        self.data = dl.__get_gata()        
         self.original_dimm = self.data[0].shape[1:]
                         
         dataset_input_shape = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
@@ -76,7 +71,7 @@ class AutoReductor():
             'SVD': (TruncatedSVD(), {'SVD__n_components': svd_range } )
             }
         # self.evaluation_model = get_ANN((math.prod(dataset_input_shape),))
-        self.evaluation_model = evaluation_model_list[0] # example
+        # self.evaluation_model = evaluation_model_list[0] # example
     
     def create_reduction_range(self, min_reduction, max_reduction, step_count):
         original_dimm_flaten = math.prod(self.original_dimm[:2])
@@ -116,19 +111,18 @@ class AutoReductor():
 
 if __name__ == "__main__":
     # show form1
-    selected_data = get_search_criteria(["mnist","fashion_mnist","cifar10"], evaluation_model_list)
+    selected_data = get_search_criteria(DataLoader().get_datasets_names(), MyEvaluationModels.evaluation_model_list)
     print(selected_data)
-    chosen_dataset = DataLoader.get_data_by_name(selected_data["dataset"])
-    chosen_classification_method = selected_data["classification_method"]
+    chosen_dataset = DataLoader().get_data_by_name(selected_data["dataset"])
+    chosen_evaluation_method = MyEvaluationModels.get_eval_model_by_name(selected_data["evaluation_method"])
     
     # analyse chosen_dataset    
-    # best_alg_list = ...    
-    best_alg_list = reduction_model_list # temp
+    best_alg_list = MyReductionModels.reduction_model_list # temp - all
     
     # show form2 with pipline creation
     selected_data2 = get_pipline_algorithms_and_ranges(best_alg_list)
     print(selected_data2)    
-    chosen_algs = selected_data2["chosen_algorithm"]
+    chosen_algs = MyReductionModels.get_reduction_model_by_name(selected_data2["chosen_algorithm"])
     reduction_ranges = selected_data2["reduction_range"]
     
     # AutoReductor(chosen_dataset, chosen_classification_method, chosen_algs, reduction_ranges).start()
