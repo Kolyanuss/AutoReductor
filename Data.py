@@ -20,6 +20,16 @@ class DataLoader():
     def get_gata(self):
         return self.data
     
+    def get_data_by_name(self, name):
+        if name == "mnist":
+            self.load_mnist()
+        if name == "fashion_mnist":
+            self.load_fashion_mnist()
+        if name == "cifar10":
+            self.load_cifar10()
+            
+        return self.get_gata()
+    
 class DataPreproces():    
     def normalize_x(data):
         (x_train, y_train, x_test, y_test) = data

@@ -13,8 +13,10 @@ from OptimalParametersSelector import OptimalParametersSelector
 from MyReductionModels import Autoencoder
 from MyEvaluationModels import get_CNN_model, get_ANN
 from form import get_search_criteria
+from form2 import get_pipline_algorithms_and_ranges
 
 evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear'), DecisionTreeClassifier(), RandomForestClassifier()]
+reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
 
 def plot(df, path_to_save=None, file_name=None):
     fig, ax1 = plt.subplots(figsize=(10, 4))    
@@ -51,8 +53,9 @@ def save_fig(path_to_save,file_name):
 
 class AutoReductor():
     results_folder = "results"
-    reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
     add_noise = False
+    
+    # def __init__(self, dataset, evaluation_model, reduction_algorithms, reduction_ranges):
     
     def __init__(self, min_reduction_svd = 2, max_reduction_svd = 8, step_count_svd = 2, min_reduction_ae = 2, max_reduction_ae = 8, step_count_ae = 2) -> None:
         """
@@ -69,8 +72,6 @@ class AutoReductor():
         ae_range = list(self.create_reduction_range(min_reduction_ae, max_reduction_ae, step_count_ae))
         svd_range = list(self.create_reduction_range(min_reduction_svd, max_reduction_svd, step_count_svd))
         self.reduction_model_dict = {
-            # 'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': list(range(50*4,160*5,30*6)) } ),
-            # 'SVD': (TruncatedSVD(), {'SVD__n_components': list(range(10,160,40))} )
             'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': ae_range } ),
             'SVD': (TruncatedSVD(), {'SVD__n_components': svd_range } )
             }
@@ -114,6 +115,20 @@ class AutoReductor():
         
 
 if __name__ == "__main__":
+    # show form1
     selected_data = get_search_criteria(["mnist","fashion_mnist","cifar10"], evaluation_model_list)
-    print("Обрані параметри:", selected_data)
-    # AutoReductor().start()
+    print(selected_data)
+    chosen_dataset = DataLoader.get_data_by_name(selected_data["dataset"])
+    chosen_classification_method = selected_data["classification_method"]
+    
+    # analyse chosen_dataset    
+    # best_alg_list = ...    
+    best_alg_list = reduction_model_list # temp
+    
+    # show form2 with pipline creation
+    selected_data2 = get_pipline_algorithms_and_ranges(best_alg_list)
+    print(selected_data2)    
+    chosen_algs = selected_data2["chosen_algorithm"]
+    reduction_ranges = selected_data2["reduction_range"]
+    
+    # AutoReductor(chosen_dataset, chosen_classification_method, chosen_algs, reduction_ranges).start()
