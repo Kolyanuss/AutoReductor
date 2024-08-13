@@ -12,6 +12,9 @@ from Data import DataLoader, DataPreproces
 from OptimalParametersSelector import OptimalParametersSelector
 from MyReductionModels import Autoencoder
 from MyEvaluationModels import get_CNN_model, get_ANN
+from form import get_search_criteria
+
+evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear'), DecisionTreeClassifier(), RandomForestClassifier()]
 
 def plot(df, path_to_save=None, file_name=None):
     fig, ax1 = plt.subplots(figsize=(10, 4))    
@@ -48,7 +51,6 @@ def save_fig(path_to_save,file_name):
 
 class AutoReductor():
     results_folder = "results"
-    evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear'), DecisionTreeClassifier(), RandomForestClassifier()]
     reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
     add_noise = False
     
@@ -73,7 +75,7 @@ class AutoReductor():
             'SVD': (TruncatedSVD(), {'SVD__n_components': svd_range } )
             }
         # self.evaluation_model_list = [get_ANN((math.prod(dataset_input_shape),))]
-        self.evaluation_model_list = [self.evaluation_model_list[0]]
+        self.evaluation_model_list = [evaluation_model_list[0]]
     
     def create_reduction_range(self, min_reduction, max_reduction, step_count):
         original_dimm_flaten = math.prod(self.original_dimm[:2])
@@ -111,4 +113,8 @@ class AutoReductor():
         
         # best_pipline = myReducePipline(ops.get_best_sequence(), ops.get_best_parametrs()) # todo
         
-# AutoReductor().start()
+
+if __name__ == "__main__":
+    selected_data = get_search_criteria(["mnist","fashion_mnist","cifar10"], evaluation_model_list)
+    print("Обрані параметри:", selected_data)
+    # AutoReductor().start()
