@@ -12,7 +12,7 @@ class PiplineForm(tk.Tk):
         self.alg_label = tk.Label(self, text="Найкращі алгоритми")
         self.alg_label.pack(pady=5)
         self.alg_var = tk.StringVar()
-        self.alg_menu = ttk.Combobox(self, textvariable=self.alg_var, width=30)
+        self.alg_menu = ttk.Combobox(self, textvariable=self.alg_var, width=60)
         self.alg_menu['values'] = best_alg_list
         self.alg_menu.pack(pady=5)
         self.alg_menu.bind("<<ComboboxSelected>>", self.check_selection)

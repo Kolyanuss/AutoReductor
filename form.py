@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 class SearchForm(tk.Tk):
-    def __init__(self, dataset_list, classification_model_list):
+    def __init__(self, dataset_list, evaluation_model_list):
         super().__init__()
 
         self.geometry("400x300")
@@ -22,7 +22,7 @@ class SearchForm(tk.Tk):
         self.classification_label.pack(pady=5)
         self.classification_var = tk.StringVar()
         self.classification_menu = ttk.Combobox(self, textvariable=self.classification_var, width=30)
-        self.classification_menu['values'] = classification_model_list
+        self.classification_menu['values'] = evaluation_model_list
         self.classification_menu.pack(pady=5)
         self.classification_menu.bind("<<ComboboxSelected>>", self.check_selection)
 
@@ -39,7 +39,7 @@ class SearchForm(tk.Tk):
     def search(self):
         self.result_data = {
             "dataset": self.dataset_var.get(),
-            "classification_method": self.classification_var.get()
+            "evaluation_method": self.classification_var.get()
         }
         self.destroy()  # Закрити форму після натискання кнопки
 
