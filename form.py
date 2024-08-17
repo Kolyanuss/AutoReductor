@@ -12,7 +12,7 @@ class SearchForm(tk.Tk):
         self.dataset_label = tk.Label(self, text="Датасет")
         self.dataset_label.pack(pady=5)
         self.dataset_var = tk.StringVar()
-        self.dataset_menu = ttk.Combobox(self, textvariable=self.dataset_var, width=30)
+        self.dataset_menu = ttk.Combobox(self, textvariable=self.dataset_var, state="readonly", width=30)
         self.dataset_menu['values'] = dataset_list
         self.dataset_menu.pack(pady=5)
         self.dataset_menu.bind("<<ComboboxSelected>>", self.check_selection)
@@ -21,7 +21,7 @@ class SearchForm(tk.Tk):
         self.classification_label = tk.Label(self, text="Спосіб класифікації")
         self.classification_label.pack(pady=5)
         self.classification_var = tk.StringVar()
-        self.classification_menu = ttk.Combobox(self, textvariable=self.classification_var, width=30)
+        self.classification_menu = ttk.Combobox(self, textvariable=self.classification_var, state="readonly", width=30)
         self.classification_menu['values'] = evaluation_model_list
         self.classification_menu.pack(pady=5)
         self.classification_menu.bind("<<ComboboxSelected>>", self.check_selection)
