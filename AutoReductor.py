@@ -77,7 +77,8 @@ class AutoReductor():
     
     def start(self):
         self.data = DataPreproces.normalize_x(self.data)
-        # self.data = DataPreproces.unwrapper(self.data)
+        if "TruncatedSVD" in str(list(self.reduction_model_dict.values())[0][0]):
+            self.data = DataPreproces.unwrapper(self.data)
         noised = ""
         if self.add_noise:
             self.data = DataPreproces.add_gaussian_noise(self.data)
@@ -91,8 +92,6 @@ class AutoReductor():
         save_path = os.path.join(self.results_folder, str(self.evaluation_model))
         save_name = "_".join(self.reduction_model_dict.keys()) + noised + ".png"
         plot(result, save_path, save_name)
-        
-        # best_pipline = myReducePipline(ops.get_best_sequence(), ops.get_best_parametrs()) # todo
         
 
 if __name__ == "__main__":
