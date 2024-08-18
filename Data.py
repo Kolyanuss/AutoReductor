@@ -32,19 +32,24 @@ class DataLoader():
     
     
 class DataPreproces():    
-    def normalize_x(data):
+    def normalize_x(data: tuple):
         (x_train, y_train, x_test, y_test) = data
         x_train = x_train.astype('float32') / 255.0
         x_test = x_test.astype('float32') / 255.0
         return (x_train, y_train, x_test, y_test)
     
-    def unwrapper(data):
+    def unwrapper(data: tuple):
+        '''
+            Return 1d arr for each x item
+            Example:
+            (60000,10,10,3) -> (60000, 300)
+        '''
         (x_train, y_train, x_test, y_test) = data
         x_train_flat = x_train.reshape((len(x_train), -1))
         x_test_flat = x_test.reshape((len(x_test), -1))
         return (x_train_flat, y_train, x_test_flat, y_test)
     
-    def add_gaussian_noise(data, mean=0.0, std=0.1):
+    def add_gaussian_noise(data: tuple, mean=0.0, std=0.1):
         (x_train, y_train, x_test, y_test) = data
         noise = np.random.normal(mean, std, x_train.shape)
         x_train_noise = x_train + noise
