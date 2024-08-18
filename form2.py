@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 class PiplineForm(tk.Tk):
-    def __init__(self, best_alg_list):
+    def __init__(self, best_alg):
         super().__init__()
 
         self.geometry("400x400")
@@ -13,7 +13,7 @@ class PiplineForm(tk.Tk):
         self.alg_label.pack(pady=5)
         self.alg_var = tk.StringVar()
         self.alg_menu = ttk.Combobox(self, textvariable=self.alg_var, state="readonly", width=60)
-        self.alg_menu['values'] = best_alg_list
+        self.alg_menu['values'] = best_alg
         self.alg_menu.pack(pady=5)
         
         # Створення контейнера для трьох полів
