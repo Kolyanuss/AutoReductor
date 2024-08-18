@@ -49,9 +49,13 @@ class Autoencoder(BaseEstimator, TransformerMixin):
         result_x = self.autoencoder.predict(X)
         return result_x.reshape((len(result_x), -1))
 
-reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
+reduction_model_list = [
+    [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF],
+    ["AE__lat_dim_ae", "SVD__n_components"]
+]
 
 def get_reduction_model_by_name(name):
-    for model in reduction_model_list:
+    for model in reduction_model_list[0]:
         if str(model) == name:
-            return model
+            index = reduction_model_list[0].index(model)
+            return model, reduction_model_list[1][index]

@@ -1,17 +1,13 @@
-from sklearn.decomposition import TruncatedSVD
-import matplotlib.pyplot as plt
-import math
 import os
+import math
+import matplotlib.pyplot as plt
 
 import MyEvaluationModels, MyReductionModels
 from Data import DataLoader, DataPreproces
 from OptimalParametersSelector import OptimalParametersSelector
-from MyReductionModels import Autoencoder
 from form import get_search_criteria
 from form2 import get_pipline_algorithms_and_ranges
 
-# evaluation_model_list = [MLPClassifier(solver="lbfgs"), SVC(kernel='linear'), DecisionTreeClassifier(), RandomForestClassifier()]
-# reduction_model_list = [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF]
 
 def plot(df, path_to_save=None, file_name=None):
     fig, ax1 = plt.subplots(figsize=(10, 4))    
@@ -50,28 +46,18 @@ class AutoReductor():
     results_folder = "results"
     add_noise = False
     
-    # def __init__(self, dataset, evaluation_model, reduction_algorithms, reduction_ranges):
-    
-    def __init__(self, min_reduction_svd = 2, max_reduction_svd = 8, step_count_svd = 2, min_reduction_ae = 2, max_reduction_ae = 8, step_count_ae = 2) -> None:
-        """
-        Args:
-        - min_reduction: Minimum reduction by X times.
-        - max_reduction: Maximum reduction by X times.
-        - step_count: Count of steps betven min and max.
-        """
-        dl = DataLoader(DataLoader.cifar10) # + інші датасети + можливість вибирати датасет
-        self.data = dl.__get_gata()        
+    def __init__(self, dataset, evaluation_model, reduction_algorithms, reduction_range):
+        self.data = dataset    
         self.original_dimm = self.data[0].shape[1:]
                         
         dataset_input_shape = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
-        ae_range = list(self.create_reduction_range(min_reduction_ae, max_reduction_ae, step_count_ae))
-        svd_range = list(self.create_reduction_range(min_reduction_svd, max_reduction_svd, step_count_svd))
+        algorithm_range = list(self.create_reduction_range(*reduction_range))
+        # svd_range = list(self.create_reduction_range(min_reduction_svd, max_reduction_svd, step_count_svd))
         self.reduction_model_dict = {
-            'AE': (Autoencoder(dataset_input_shape), { 'AE__lat_dim_ae': ae_range } ),
-            'SVD': (TruncatedSVD(), {'SVD__n_components': svd_range } )
+            str(reduction_algorithms[1]).split("__")[0] : (reduction_algorithms[0](dataset_input_shape), { reduction_algorithms[1]: algorithm_range } ),
+            # 'SVD': (TruncatedSVD(), {'SVD__n_components': svd_range } )
             }
-        # self.evaluation_model = get_ANN((math.prod(dataset_input_shape),))
-        # self.evaluation_model = evaluation_model_list[0] # example
+        self.evaluation_model = evaluation_model
     
     def create_reduction_range(self, min_reduction, max_reduction, step_count):
         original_dimm_flaten = math.prod(self.original_dimm[:2])
@@ -117,7 +103,7 @@ if __name__ == "__main__":
     chosen_evaluation_method = MyEvaluationModels.get_eval_model_by_name(selected_data["evaluation_method"])
     
     # analyse chosen_dataset    
-    best_alg_list = MyReductionModels.reduction_model_list # temp - all
+    best_alg_list = MyReductionModels.reduction_model_list[0] # temp - all
     
     # show form2 with pipline creation
     selected_data2 = get_pipline_algorithms_and_ranges(best_alg_list)
@@ -125,4 +111,4 @@ if __name__ == "__main__":
     chosen_algs = MyReductionModels.get_reduction_model_by_name(selected_data2["chosen_algorithm"])
     reduction_ranges = selected_data2["reduction_range"]
     
-    # AutoReductor(chosen_dataset, chosen_classification_method, chosen_algs, reduction_ranges).start()
+    AutoReductor(chosen_dataset, chosen_evaluation_method, chosen_algs, reduction_ranges).start()
