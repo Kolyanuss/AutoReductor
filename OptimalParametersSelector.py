@@ -47,13 +47,15 @@ class OptimalParametersSelector():
     
     def plot_accuracy_matrix(self):
         arr = self.results
+        if len(arr) != 5:
+            return
         heatmap_data = arr.pivot(index=arr.columns[0], columns=arr.columns[1], values='mean_test_score')
         
         plt.figure(figsize=(10, 8))
         sns.heatmap(heatmap_data, annot=True, cmap='YlOrRd', fmt='.2f')
 
         plt.title('Heatmap of Accuracy')
-        plt.xlabel('SVD_n_components')
         plt.ylabel(arr.columns[0])
+        plt.xlabel(arr.columns[1])
 
         plt.show()
