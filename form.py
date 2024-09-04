@@ -43,7 +43,7 @@ class SearchForm(tk.Tk):
         }
         self.destroy()  # Закрити форму після натискання кнопки
 
-def get_search_criteria(dataset_list=['Dataset 1', 'Dataset 2', 'Dataset 3'], classification_model_list=['Method 1', 'Method 2', 'Method 3']):
+def get_search_criteria(dataset_list, classification_model_list):
     form = SearchForm(dataset_list, classification_model_list)
     form.mainloop()
     return form.result_data
