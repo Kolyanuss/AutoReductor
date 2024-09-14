@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 class DataLoader():
+    folder_path = "custom_data"
+    test_size = 0.2
     def __init__(self):
         self.dataset_dict = {"mnist": self.__mnist, "fashion_mnist": self.__fashion_mnist, "cifar10": self.__cifar10, "Import custom dataset": self.__import_custom_dataset }
         
@@ -24,12 +26,15 @@ class DataLoader():
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
         return (x_train, y_train.ravel(), x_test, y_test.ravel())
     
-    def __import_custom_dataset(self, folder_path, test_size=0.2):
+    def __import_custom_dataset(self):
         x = []
         y = []
         
-        for class_name in os.listdir(folder_path):
-            class_folder_path = os.path.join(folder_path, class_name)
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
+        
+        for class_name in os.listdir(self.folder_path):
+            class_folder_path = os.path.join(self.folder_path, class_name)
             
             if not os.path.isdir(class_folder_path):
                 continue
@@ -42,7 +47,7 @@ class DataLoader():
 
         x = np.array(x)
         y = np.array(y)
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42, stratify=y)
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=self.test_size, random_state=42, stratify=y)
         return (x_train, y_train, x_test, y_test)
     
     def get_data_by_name(self, name):
