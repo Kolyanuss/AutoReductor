@@ -48,16 +48,34 @@ class AutoReductor():
     
     def __init__(self, dataset, evaluation_model, reduction_algorithms, reduction_range):
         self.data = dataset    
+        self.evaluation_model = evaluation_model
         self.original_dimm = self.data[0].shape[1:]
                         
         dataset_input_shape = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
-        algorithm_range = list(self.create_reduction_range(*reduction_range))
-        # svd_range = list(self.create_reduction_range(min_reduction_svd, max_reduction_svd, step_count_svd))
-        self.reduction_model_dict = {
-            str(reduction_algorithms[1]).split("__")[0] : (reduction_algorithms[0](dataset_input_shape), { reduction_algorithms[1]: algorithm_range } ),
-            # 'SVD': (TruncatedSVD(), {'SVD__n_components': svd_range } )
-            }
-        self.evaluation_model = evaluation_model
+        
+        # self.reduction_model_dict = {}        
+        # for alg, range in zip(reduction_algorithms, reduction_range):
+        #     algorithm_range = list(self.create_reduction_range(*range))
+        #     algorithm_name = str(alg[1]).split("__")[0]
+        #     self.reduction_model_dict.update({
+        #         algorithm_name : (alg[0](dataset_input_shape), { alg[1]: algorithm_range } ),
+        #         # 'SVD'        : (TruncatedSVD(),            {'SVD__n_components': svd_range } )
+        #         })
+        
+        self.steps = []
+        self.param_grid = {}
+        for alg, range in zip(reduction_algorithms, reduction_range):
+            algorithm_name = str(alg[1]).split("__")[0]
+            if "Autoencoder" in str(alg[0]):
+                algorithm_model = alg[0](dataset_input_shape)
+            else:
+                algorithm_model = alg[0]()
+            self.steps.append((algorithm_name, algorithm_model))
+            algorithm_range = list(self.create_reduction_range(*range))
+            self.param_grid.update({ alg[1]: algorithm_range })
+        
+        self.steps.append(('evaluation', evaluation_model))
+            
     
     def create_reduction_range(self, min_reduction, max_reduction, step_count):
         original_dimm_flaten = math.prod(self.original_dimm[:2])
@@ -77,7 +95,9 @@ class AutoReductor():
     
     def start(self):
         self.data = DataPreproces.normalize_x(self.data)
-        if "TruncatedSVD" in str(list(self.reduction_model_dict.values())[0][0]):
+        # name_of_first_object = str(list(self.reduction_model_dict.values())[0][0])
+        name_of_first_object = str(self.steps[0][1])
+        if "TruncatedSVD" in name_of_first_object:
             self.data = DataPreproces.unwrapper(self.data)
         noised = ""
         if self.add_noise:
@@ -85,12 +105,13 @@ class AutoReductor():
             noised = "_noised"
         print(self.data[0].shape)
         
-        ops = OptimalParametersSelector(self.data, self.reduction_model_dict, self.evaluation_model)
+        ops = OptimalParametersSelector(self.data, self.steps, self.param_grid)
         ops.find_optimal_param()
         ops.plot_accuracy_matrix()
         result = ops.get_result()
         save_path = os.path.join(self.results_folder, str(self.evaluation_model))
-        save_name = "_".join(self.reduction_model_dict.keys()) + noised + ".png"
+        # save_name = "_".join(self.reduction_model_dict.keys()) + noised + ".png"
+        save_name = '_'.join([step[0] for step in self.steps]) + noised + ".png"
         plot(result, save_path, save_name)
         
 
@@ -106,8 +127,12 @@ if __name__ == "__main__":
     
     # show form2 with pipline creation
     selected_data2 = get_pipline_algorithms_and_ranges(best_alg_list)
-    print(selected_data2)    
-    chosen_algs = MyReductionModels.get_reduction_model_by_name(selected_data2["chosen_algorithm"])
-    reduction_ranges = selected_data2["reduction_range"]
+    print(selected_data2)
+    
+    chosen_algs = []
+    reduction_ranges = []    
+    for item in selected_data2:    
+        chosen_algs.append(MyReductionModels.get_reduction_model_by_name(item["chosen_algorithm"]))
+        reduction_ranges.append(item["reduction_range"])
     
     AutoReductor(chosen_dataset, chosen_evaluation_method, chosen_algs, reduction_ranges).start()

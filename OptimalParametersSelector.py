@@ -6,7 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 class OptimalParametersSelector():
-    def __init__(self, data, reduction_model_dict, evaluation_model) -> None:
+    def __init__(self, data, steps, param_grid) -> None:
         '''
         Example: 
         steps = [
@@ -19,14 +19,7 @@ class OptimalParametersSelector():
         }
         '''
         self.data = data
-        steps = []
-        self.param_grid = {}
-        
-        for k,v in reduction_model_dict.items():
-            steps.append((k, v[0]))
-            self.param_grid.update(v[1])
-            
-        steps.append(('evaluation', evaluation_model))
+        self.param_grid = param_grid
         self.pipeline = Pipeline(steps)
 
         print(steps)
