@@ -51,7 +51,8 @@ class Autoencoder(BaseEstimator, TransformerMixin):
 
 reduction_model_list = [
     [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF],
-    ["AE__lat_dim_ae", "SVD__n_components"]
+    ["AE__lat_dim_ae", "SVD__n_components", "PCA__n_components", 
+     "FastICA__n_components", "TSNE__n_components", "NMF__n_components"]
 ]
 
 def get_reduction_model_by_name(name):

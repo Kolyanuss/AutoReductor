@@ -4,6 +4,8 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 class OptimalParametersSelector():
     def __init__(self, data, steps, param_grid) -> None:
@@ -19,6 +21,7 @@ class OptimalParametersSelector():
         }
         '''
         self.data = data
+        self.steps = steps
         self.param_grid = param_grid
         self.pipeline = Pipeline(steps)
 
@@ -52,3 +55,23 @@ class OptimalParametersSelector():
         plt.xlabel(arr.columns[1])
 
         plt.show()
+    
+    def get_reducted_data(self, param_list):
+        # [
+        #     ('scaler', StandardScaler()),
+            # ('svd', TruncatedSVD(n_components=30)),
+        #     ('pca', PCA(n_components=10))
+        # ]
+        
+        steps = self.steps[:-1]
+        for step_id, param in zip(range(len(steps)), param_list):
+            steps[step_id] = (steps[step_id][0], type(steps[step_id][1])(param))
+        
+        # steps.insert(0, ('scaler', StandardScaler()))
+        pipeline = Pipeline(steps)
+        
+        dataX = np.concatenate((self.data[0], self.data[2]))
+        X_reduced = pipeline.fit_transform(dataX)
+        print(X_reduced.shape)
+        print(X_reduced[0])
+        return X_reduced

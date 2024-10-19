@@ -1,13 +1,15 @@
 import os
 import math
 import matplotlib.pyplot as plt
-
+import numpy as np
 import MyEvaluationModels, MyReductionModels
 from Data import DataLoader, DataPreproces
 from OptimalParametersSelector import OptimalParametersSelector
 from form import get_search_criteria
 from form2 import get_pipline_algorithms_and_ranges
+import form3ReturnData
 
+reducted_images_path = "reducted_images"
 
 def plot(df, path_to_save=None, file_name=None):
     fig, ax1 = plt.subplots(figsize=(10, 4))    
@@ -53,15 +55,6 @@ class AutoReductor():
                         
         dataset_input_shape = self.original_dimm if len(self.original_dimm) > 2 else self.original_dimm + (1,)
         
-        # self.reduction_model_dict = {}        
-        # for alg, range in zip(reduction_algorithms, reduction_range):
-        #     algorithm_range = list(self.create_reduction_range(*range))
-        #     algorithm_name = str(alg[1]).split("__")[0]
-        #     self.reduction_model_dict.update({
-        #         algorithm_name : (alg[0](dataset_input_shape), { alg[1]: algorithm_range } ),
-        #         # 'SVD'        : (TruncatedSVD(),            {'SVD__n_components': svd_range } )
-        #         })
-        
         self.steps = []
         self.param_grid = {}
         for alg, range in zip(reduction_algorithms, reduction_range):
@@ -94,25 +87,33 @@ class AutoReductor():
         
     
     def start(self):
-        self.data = DataPreproces.normalize_x(self.data)
+        data = DataPreproces.normalize_x(self.data)
         # name_of_first_object = str(list(self.reduction_model_dict.values())[0][0])
         name_of_first_object = str(self.steps[0][1])
         if "TruncatedSVD" in name_of_first_object:
-            self.data = DataPreproces.unwrapper(self.data)
+            data = DataPreproces.unwrapper(data)
         noised = ""
         if self.add_noise:
-            self.data = DataPreproces.add_gaussian_noise(self.data)
+            data = DataPreproces.add_gaussian_noise(data)
             noised = "_noised"
-        print(self.data[0].shape)
+        print(data[0].shape)
         
-        ops = OptimalParametersSelector(self.data, self.steps, self.param_grid)
+        ops = OptimalParametersSelector(data, self.steps, self.param_grid)
         ops.find_optimal_param()
         ops.plot_accuracy_matrix()
         result = ops.get_result()
         save_path = os.path.join(self.results_folder, str(self.evaluation_model))
-        # save_name = "_".join(self.reduction_model_dict.keys()) + noised + ".png"
-        save_name = '_'.join([step[0] for step in self.steps]) + noised + ".png"
-        plot(result, save_path, save_name)
+        
+        result_save_name = '_'.join([step[0] for step in self.steps]) + noised + ".png"
+        data_save_name = '_'.join([step[0] for step in self.steps]) + noised + ".csv"
+        plot(result, save_path, result_save_name)
+        
+        form3ReturnData.create_form(len(self.steps)-1)
+        usersParam = form3ReturnData.get_input_values()
+        reducted_data = ops.get_reducted_data(usersParam)
+        X = np.concatenate((self.data[0], self.data[2]))
+        Y = np.concatenate((self.data[1], self.data[3]))
+        DataPreproces.save_reducted_data(X, Y, reducted_data, save_path, data_save_name)
         
 
 if __name__ == "__main__":

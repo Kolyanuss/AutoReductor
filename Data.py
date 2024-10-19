@@ -1,8 +1,10 @@
 import numpy as np
 import tensorflow as tf
+import csv
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 class DataLoader():
@@ -78,6 +80,7 @@ class DataPreproces():
         x_test_flat = x_test.reshape((len(x_test), -1))
         return (x_train_flat, y_train, x_test_flat, y_test)
     
+    
     def add_gaussian_noise(data: tuple, mean=0.0, std=0.1):
         (x_train, y_train, x_test, y_test) = data
         noise = np.random.normal(mean, std, x_train.shape)
@@ -85,3 +88,34 @@ class DataPreproces():
         noise = np.random.normal(mean, std, x_test.shape)
         x_test_noise = x_test + noise
         return (x_train_noise, y_train, x_test_noise, y_test)
+    
+    def save_reducted_data(X, Y, X_reduced, save_path, data_save_name):
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        
+        if not data_save_name.endswith('.csv'):
+            data_save_name += '.csv'
+        
+        file_path = os.path.join(save_path, data_save_name)        
+        with open(file_path, mode='w', newline='') as file:
+            writer = csv.writer(file, delimiter=';')
+            
+            # Записуємо заголовки
+            writer.writerow(['Image_id', 'class', 'original_width', 'original_height', 'original_channel', 'reducted_data'])
+            
+            # Проходимо через всі зображення та їхні редуковані вектори
+            for i, (image, img_class, reduced_data) in enumerate(zip(X, Y, X_reduced)):
+                
+                if len(image.shape) == 2:
+                    original_height, original_width = image.shape
+                    original_channel = 1
+                elif len(image.shape) == 3:
+                    original_height, original_width, original_channel = image.shape                
+                
+                reducted_data_str = ', '.join(map(str, reduced_data))  # Форматуємо вектор редукованих даних в рядок
+                
+                # Записуємо рядок в файл
+                writer.writerow([i + 1, img_class, original_width, original_height, original_channel, reducted_data_str])
+
+        print(f'Data successfully saved to {file_path}')
+
