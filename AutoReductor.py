@@ -90,7 +90,7 @@ class AutoReductor():
         data = DataPreproces.normalize_x(self.data)
         # name_of_first_object = str(list(self.reduction_model_dict.values())[0][0])
         name_of_first_object = str(self.steps[0][1])
-        if "TruncatedSVD" in name_of_first_object:
+        if any(substring in name_of_first_object for substring in ("TruncatedSVD", "FastICA")):
             data = DataPreproces.unwrapper(data)
         noised = ""
         if self.add_noise:
@@ -110,6 +110,8 @@ class AutoReductor():
         
         form3ReturnData.create_form(len(self.steps)-1)
         usersParam = form3ReturnData.get_input_values()
+        if len(usersParam) == 0:
+            return
         reducted_data = ops.get_reducted_data(usersParam)
         X = np.concatenate((self.data[0], self.data[2]))
         Y = np.concatenate((self.data[1], self.data[3]))
