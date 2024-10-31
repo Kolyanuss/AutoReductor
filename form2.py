@@ -11,7 +11,7 @@ class PiplineForm(tk.Tk):
         self.best_alg = best_alg
         
         # Лічильник кількості блоків
-        self.block_count_label = tk.Label(self, text="Кількість блоків")
+        self.block_count_label = tk.Label(self, text="Кількість етапів в пайплайні")
         self.block_count_label.pack(pady=5)
         self.block_count_var = tk.IntVar(value=1)  # За замовчуванням 1
         self.block_count_spinbox = tk.Spinbox(self, from_=1, to=3, width=10, textvariable=self.block_count_var, command=self.update_blocks)
@@ -55,7 +55,7 @@ class PiplineForm(tk.Tk):
         block_frame.pack(pady=10)
 
         # випадаюче меню 
-        alg_label = tk.Label(block_frame, text=f"Найкращі алгоритми (Блок {block_num})")
+        alg_label = tk.Label(block_frame, text=f"Пропоновані алгоритми (Етап {block_num})")
         alg_label.grid(row=0, column=0, columnspan=3, pady=5)
         alg_var = tk.StringVar()
         alg_menu = ttk.Combobox(block_frame, textvariable=alg_var, state="readonly", width=60)
@@ -64,17 +64,17 @@ class PiplineForm(tk.Tk):
         alg_menu.bind("<<ComboboxSelected>>", self.check_selection)
 
         # Поля для введення min_reduction, max_reduction, step_count
-        min_reduction_label = tk.Label(block_frame, text="Min Reduction")
+        min_reduction_label = tk.Label(block_frame, text="Мінімальна ступінь стиснення")
         min_reduction_label.grid(row=2, column=0, padx=5)
         min_reduction_spinbox = tk.Spinbox(block_frame, from_=1, to=100, width=10)
         min_reduction_spinbox.grid(row=3, column=0, padx=5)
 
-        max_reduction_label = tk.Label(block_frame, text="Max Reduction")
+        max_reduction_label = tk.Label(block_frame, text="Максимальна ступінь стиснення")
         max_reduction_label.grid(row=2, column=1, padx=5)
         max_reduction_spinbox = tk.Spinbox(block_frame, from_=1, to=100, width=10)
         max_reduction_spinbox.grid(row=3, column=1, padx=5)
 
-        step_count_label = tk.Label(block_frame, text="Step Count")
+        step_count_label = tk.Label(block_frame, text="Крок")
         step_count_label.grid(row=2, column=2, padx=5)
         step_count_spinbox = tk.Spinbox(block_frame, from_=1, to=100, width=10)
         step_count_spinbox.grid(row=3, column=2, padx=5)
