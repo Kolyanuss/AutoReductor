@@ -6,9 +6,11 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
+import tkinter as tk
+from tkinter import filedialog
 
 class DataLoader():
-    folder_path = "custom_data"
+    folder_path = ""
     test_size = 0.2
     def __init__(self):
         self.dataset_dict = {"mnist": self.__mnist, "fashion_mnist": self.__fashion_mnist, "cifar10": self.__cifar10, "Import custom dataset": self.__import_custom_dataset }
@@ -31,9 +33,14 @@ class DataLoader():
     def __import_custom_dataset(self):
         x = []
         y = []
+        root = tk.Tk()
+        root.withdraw()
+        self.folder_path = filedialog.askdirectory(title="Оберіть папку")
+        root.destroy()
         
         if not os.path.exists(self.folder_path):
-            os.makedirs(self.folder_path)
+            print("Error, folder is'n exist")
+            exit(1)
         
         for class_name in os.listdir(self.folder_path):
             class_folder_path = os.path.join(self.folder_path, class_name)
