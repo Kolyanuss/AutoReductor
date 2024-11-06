@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
 class DataLoader():
     folder_path = ""
@@ -125,4 +125,5 @@ class DataPreproces():
                 writer.writerow([i + 1, img_class, original_width, original_height, original_channel, reducted_data_str])
 
         print(f'Data successfully saved to {file_path}')
+        messagebox.showinfo("Info", f'Data successfully saved to {file_path}')
 
