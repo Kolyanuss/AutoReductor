@@ -49,8 +49,20 @@ class Autoencoder(BaseEstimator, TransformerMixin):
         result_x = self.autoencoder.predict(X)
         return result_x.reshape((len(result_x), -1))
 
+class TSNETransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, n_components=2):
+        self.n_components = n_components
+        self.tsne = TSNE(n_components=n_components)
+
+    def fit(self, X, y=None):
+        self.X_transformed = self.tsne.fit_transform(X)
+        return self
+
+    def transform(self, X, y=None):
+        return self.X_transformed
+
 reduction_model_list = [
-    [Autoencoder, TruncatedSVD, PCA, FastICA, TSNE, NMF],
+    [Autoencoder, TruncatedSVD, PCA, FastICA, TSNETransformer, NMF],
     ["AE__lat_dim_ae", "SVD__n_components", "PCA__n_components", 
      "FastICA__n_components", "TSNE__n_components", "NMF__n_components"]
 ]
