@@ -23,18 +23,28 @@ def create_form(num_el):
     input_values = []
 
     window = tk.Tk()
-    window.title("Форма")
+    window.title("Навчання на власних параметрах")
 
     # Напис вгорі вікна
-    label = tk.Label(window, text="Підібрані параметри для алгоритмів редукції:", font=("Arial", 16))
+    label = tk.Label(window, text="Введіть бажані параметри для алгоритмів редукції:", font=("Arial", 16))
     label.pack(pady=10)
 
     input_frame = tk.Frame(window)
     input_frame.pack(pady=10)
+    
     # Поля для вводу
-    for _ in range(num_el):
-        entry = tk.Entry(input_frame)
-        entry.pack(side=tk.LEFT, padx=5)
+    for i in range(num_el):
+        field_frame = tk.Frame(input_frame)
+        field_frame.pack(side=tk.LEFT, pady=5)  # Використовуємо TOP замість LEFT для вертикального розташування
+
+        label = tk.Label(field_frame, text=f"Алг. {i + 1}")
+        # label.pack(side=tk.LEFT, padx=5)
+        label.grid(row=0, column=0, padx=5)
+
+        entry = tk.Entry(field_frame)
+        # entry.pack(side=tk.LEFT, padx=5)
+        entry.grid(row=1, column=0, padx=5)
+        
         entries.append(entry)
 
     # Frame для кнопок
