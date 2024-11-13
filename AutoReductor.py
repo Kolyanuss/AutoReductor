@@ -5,9 +5,9 @@ import numpy as np
 import MyEvaluationModels, MyReductionModels
 from Data import DataLoader, DataPreproces
 from OptimalParametersSelector import OptimalParametersSelector
-from form import get_search_criteria
-from form2 import get_pipline_algorithms_and_ranges
-import form3ReturnData
+from gui.main_window import get_search_criteria
+from gui.parameters_form import get_pipline_algorithms_and_ranges
+import gui.final_traning_form as final_traning_form
 
 reducted_images_path = "reducted_images"
 
@@ -107,8 +107,8 @@ class AutoReductor():
         data_save_name = '_'.join([step[0] for step in self.steps]) + noised + ".csv"
         plot(result, save_path, result_save_name)
         
-        form3ReturnData.create_form(len(self.steps)-1)
-        usersParam = form3ReturnData.get_input_values()
+        final_traning_form.create_form(len(self.steps)-1)
+        usersParam = final_traning_form.get_input_values()
         if len(usersParam) == 0:
             return
         reducted_data = ops.get_reducted_data(usersParam)
