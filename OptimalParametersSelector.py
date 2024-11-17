@@ -67,7 +67,6 @@ class OptimalParametersSelector():
         for step_id, param in zip(range(len(steps)), param_list):
             steps[step_id] = (steps[step_id][0], type(steps[step_id][1])(param))
         
-        # steps.insert(0, ('scaler', StandardScaler()))
         pipeline = Pipeline(steps)
         
         dataX = np.concatenate((self.data[0], self.data[2]))
