@@ -89,7 +89,7 @@ class AutoReductor():
     def start(self):
         data = DataPreproces.normalize_x(self.data)
         name_of_first_object = str(self.steps[0][1])
-        if any(substring in name_of_first_object for substring in ("TruncatedSVD", "FastICA", "TSNETransformer", "NMF")):
+        if any(substring in name_of_first_object for substring in ("TruncatedSVD", "PCA", "FastICA", "TSNETransformer", "NMF")):
             data = DataPreproces.unwrapper(data)
         noised = ""
         if self.add_noise:
