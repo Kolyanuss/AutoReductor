@@ -4,3 +4,4 @@ results/
 *.jpg
 *.png
 test*
+!media/*
