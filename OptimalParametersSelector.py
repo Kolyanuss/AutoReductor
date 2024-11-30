@@ -65,7 +65,12 @@ class OptimalParametersSelector():
         
         steps = self.steps[:-1]
         for step_id, param in zip(range(len(steps)), param_list):
-            steps[step_id] = (steps[step_id][0], type(steps[step_id][1])(param))
+            if steps[step_id][0] == "AE":
+                dataset_input_shape = steps[step_id][1].input_shape
+                alg = type(steps[step_id][1])(dataset_input_shape, param)
+            else:
+                alg = type(steps[step_id][1])(param)
+            steps[step_id] = (steps[step_id][0], alg)
         
         pipeline = Pipeline(steps)
         
