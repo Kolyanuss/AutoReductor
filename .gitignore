@@ -5,3 +5,4 @@ results/
 *.png
 test*
 !media/*
+start.bat
